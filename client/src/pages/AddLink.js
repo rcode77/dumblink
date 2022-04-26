@@ -61,6 +61,12 @@ const styles = {
     width: "40%",
     justifyContent: "center",
   },
+  profile: {
+    width: "200px",
+    height: "200px",
+    marginRight: "10px",
+    marginLeft: 50,
+  },
 };
 
 function AddLink() {
@@ -72,47 +78,31 @@ function AddLink() {
     linkImage: "",
     title: "",
     description: "",
-    links: [
-      // {
-      //   linkTitle: "",
-      //   url: "",
-      // },
-      // {
-      //   linkTitle: "",
-      //   url: "",
-      // },
-    ],
+    links: [],
   });
-
-  // const { title, description, links } = form;
 
   const addAnotherLink = (e) => {
     e.preventDefault();
 
-    const data = {
-      linkTitle: "",
-      url: "",
-    };
-
     setForm({
-      links: [...form.links, { data }],
+      ...form,
+      links: [...form.links, { linkTitle: "", url: "" }],
     });
   };
 
-  const linkChange = (e, i) => {
+  const handleChange = (e, i) => {
     const newLinks = form.links;
-    newLinks[i] = { [e.target.name]: e.target.value, ...newLinks[i] };
+    newLinks[i] = { ...newLinks[i], [e.target.name]: e.target.value };
     setForm({ links: newLinks });
-  };
 
-  const handleChange = (e) => {
     setForm({
       ...form,
+
       [e.target.name]:
         e.target.type === "file" ? e.target.files : e.target.value,
     });
 
-    if (e.target.type === "file" && e.target.name === "cover") {
+    if (e.target.type === "file") {
       let url = URL.createObjectURL(e.target.files[0]);
       setPreview(url);
     }
@@ -128,16 +118,11 @@ function AddLink() {
         },
       };
 
-      // const linksData = JSON.parse(form.links);
-
       const formData = new FormData();
       formData.set("title", form.title);
       formData.set("description", form.description);
       formData.set("linkImage", form.linkImage[0], form.linkImage[0].name);
-
-      // const {linkTitle, url} = form.links
-      // const linksData = {linkTitle, url}
-      formData.set("links", form.title);
+      formData.set("links", JSON.stringify(form.links));
 
       const response = await API.post("/link", formData, config);
 
@@ -147,19 +132,10 @@ function AddLink() {
       // setForm({
       //   title: "",
       //   description: "",
-      //   links: [
-      //     {
-      //       linkTitle: "",
-      //       url: "",
-      //     },
-      //     {
-      //       linkTitle: "",
-      //       url: "",
-      //     },
-      //   ],
+      //   links: [],
       // });
 
-      setPreview(null);
+      // setPreview(null);
 
       if (response.data.status === "success") {
         const alert = (
@@ -235,9 +211,17 @@ function AddLink() {
                   >
                     <Row style={{ display: "flex", alignItems: "center" }}>
                       <Col md={4}>
-                        <img src="assets/images/upload.png" alt="upload" />
+                        {preview && (
+                          <div className="d-flex justify-content-center">
+                            <img
+                              src={preview}
+                              style={styles.profile}
+                              alt="preview"
+                            />
+                          </div>
+                        )}
                       </Col>
-                      <Col>
+                      <Col style={{ marginLeft: 30 }}>
                         <Form.Group className="form-group">
                           <Form.Control
                             id="input-file"
@@ -285,7 +269,7 @@ function AddLink() {
                         </Form.Group>
                       </Col>
                     </Row>
-                    {form.links.map((item, i) => (
+                    {form.links.map((item, index) => (
                       <Row style={{ marginTop: 30 }}>
                         <Col
                           style={{
@@ -310,7 +294,7 @@ function AddLink() {
                                     type="text"
                                     // placeholder="ex. Your Title"
                                     name="linkTitle"
-                                    onChange={(e) => linkChange(e, i)}
+                                    onChange={(e) => handleChange(e, index)}
                                     style={styles.linkForm}
                                     // value={item.linkTitle}
                                   />
@@ -323,7 +307,7 @@ function AddLink() {
                                     type="text"
                                     // placeholder="ex. Your Title"
                                     name="url"
-                                    onChange={(e) => linkChange(e, i)}
+                                    onChange={(e) => handleChange(e, index)}
                                     style={styles.linkForm}
                                     // value={item.url}
                                   />

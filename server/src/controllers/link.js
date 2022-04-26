@@ -11,32 +11,10 @@ exports.addLink = async (req, res) => {
       uniqueLink: uniqueLink,
       linkImage: req.file.filename,
       idUser: req.user.id,
-      // links: [
-      //   { linkTitle: "Facebook", url: "https://www.facebook.com" },
-      //   { linkTitle: "Twitter", url: "https://www.twitter.com" },
-      //   { linkTitle: "Youtube", url: "https://www.youtube.com/" },
-      //   { linkTitle: "Instagram", url: "https://www.instagram.com" },
-      //   { linkTitle: "Whatsapp", url: "https://www.whatsapp.com/" },
-      // ],
     });
-
-    // let linkData = await link.findOne({
-    //   where: {
-    //     id: newLink.id,
-    //   },
-    //   attributes: {
-    //     exclude: ["createdAt", "updatedAt"],
-    //   },
-    // });
-
-    // linkData = JSON.parse(JSON.stringify(linkData));
-    // const links = JSON.parse(linkData.links);
 
     res.send({
       status: "success",
-      // data: {
-      //   link: { ...linkData, links: links },
-      // },
     });
   } catch (error) {
     console.log(error);
@@ -116,7 +94,7 @@ exports.getLink = async (req, res) => {
       },
     });
 
-    let links = JSON.parse(linkData.links);
+    let links = JSON.parse(JSON.parse(linkData.links));
 
     linkData = {
       ...linkData,
