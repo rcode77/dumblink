@@ -166,3 +166,39 @@ exports.updateLink = async (req, res) => {
     });
   }
 };
+
+exports.getLinkForEdit = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    let linkData = await link.findOne({
+      where: {
+        uniqueLink: id,
+      },
+      attributes: {
+        exclude: ["createdAt", "updatedAt"],
+      },
+    });
+
+    linkData = JSON.parse(JSON.stringify(linkData));
+
+    let links = JSON.parse(JSON.parse(linkData.links));
+
+    linkData = {
+      ...linkData,
+      linkImage: process.env.IMAGES_PATH_FILE + linkData.linkImage,
+      links: links,
+    };
+
+    res.send({
+      status: "success",
+      linkData,
+    });
+  } catch (error) {
+    console.log(error);
+    res.send({
+      status: "failed",
+      message: "Server Error",
+    });
+  }
+};

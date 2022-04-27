@@ -9,6 +9,7 @@ const {
   addLink,
   getLinks,
   getLink,
+  getLinkForEdit,
   deleteLink,
   updateLink,
 } = require("../controllers/link");
@@ -37,8 +38,9 @@ router.patch("/update-user", auth, updateUser);
 router.post("/link", auth, uploadImage("linkImage"), addLink);
 router.get("/links", auth, getLinks);
 router.get("/link/:id", auth, getLink);
+router.get("/link-edit/:id", auth, getLinkForEdit);
 router.delete("/link/:id", auth, deleteLink);
-router.patch("/link", auth, uploadImage("linkImage"), updateLink);
+router.patch("/link/:id", auth, uploadImage("linkImage"), updateLink);
 
 // router.post("/transaction", auth, uploadImage("transferProof"), addTransaction);
 // router.get("/transaction/:id", getTransaction);

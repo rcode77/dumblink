@@ -1,5 +1,5 @@
 import { Container, Row, Col, Button, Form, Alert } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { useContext, useState, useEffect } from "react";
 
@@ -64,9 +64,18 @@ const styles = {
     width: "40%",
     justifyContent: "center",
   },
+  profile: {
+    width: "200px",
+    height: "200px",
+    marginRight: "10px",
+    marginLeft: 50,
+  },
 };
 
 function UpdateLink() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
   const titlePage = "MyLink";
   const [message, setMessage] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -78,35 +87,47 @@ function UpdateLink() {
     links: [],
   });
 
-  // const { title, description, links, uniqueLink } = form;
+  const getLink = async (id) => {
+    try {
+      const response = await API.get("/link-edit/" + id);
+      setForm({
+        ...form,
+        title: response.data.linkData.title,
+        description: response.data.linkData.description,
+        links: response.data.linkData.links,
+      });
+      setPreview(response.data.linkData.linkImage);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getLink(id);
+  }, []);
 
   const addAnotherLink = (e) => {
     e.preventDefault();
 
-    const data = {
-      linkTitle: "",
-      url: "",
-    };
-
     setForm({
-      links: [...form.links, { data }],
+      ...form,
+      links: [...form.links, { linkTitle: "", url: "" }],
     });
   };
 
-  const linkChange = (e, i) => {
+  const handleChange = (e, i) => {
     const newLinks = form.links;
-    newLinks[i] = { [e.target.name]: e.target.value, ...newLinks[i] };
-    setForm({ ...form, links: newLinks });
-  };
+    newLinks[i] = { ...newLinks[i], [e.target.name]: e.target.value };
+    setForm({ links: newLinks });
 
-  const handleChange = (e) => {
     setForm({
       ...form,
+
       [e.target.name]:
         e.target.type === "file" ? e.target.files : e.target.value,
     });
 
-    if (e.target.type === "file" && e.target.name === "cover") {
+    if (e.target.type === "file") {
       let url = URL.createObjectURL(e.target.files[0]);
       setPreview(url);
     }
@@ -122,36 +143,16 @@ function UpdateLink() {
         },
       };
 
-      // const linksData = JSON.parse(form.links);
-
       const formData = new FormData();
       formData.set("title", form.title);
       formData.set("description", form.description);
       formData.set("linkImage", form.linkImage[0], form.linkImage[0].name);
+      formData.set("links", JSON.stringify(form.links));
 
-      formData.set("links", form.links);
-
-      const response = await API.post("/link", formData, config);
+      const response = await API.patch("/link/" + id, formData, config);
 
       console.log(response);
       console.log(form);
-
-      // setForm({
-      //   title: "",
-      //   description: "",
-      //   links: [
-      //     {
-      //       linkTitle: "",
-      //       url: "",
-      //     },
-      //     {
-      //       linkTitle: "",
-      //       url: "",
-      //     },
-      //   ],
-      // });
-
-      setPreview(null);
 
       if (response.data.status === "success") {
         const alert = (
@@ -165,6 +166,8 @@ function UpdateLink() {
         setMessage(alert);
 
         new FormData();
+
+        navigate("/my-link");
       } else {
         const alert = (
           <Alert
@@ -193,7 +196,7 @@ function UpdateLink() {
             <Form onSubmit={handleOnSubmit}>
               <Row>
                 <Col style={{ backgroundColor: "white" }}>
-                  <p style={styles.title}>My Links</p>
+                  <p style={styles.title}>{titlePage}</p>
                 </Col>
               </Row>
               <Row style={{ marginTop: 45, display: "flex" }}>
@@ -227,9 +230,17 @@ function UpdateLink() {
                   >
                     <Row style={{ display: "flex", alignItems: "center" }}>
                       <Col md={4}>
-                        <img src={images} alt="upload" />
+                        {preview && (
+                          <div className="d-flex justify-content-center">
+                            <img
+                              src={preview}
+                              style={styles.profile}
+                              alt="preview"
+                            />
+                          </div>
+                        )}
                       </Col>
-                      <Col>
+                      <Col style={{ marginLeft: 30 }}>
                         <Form.Group className="form-group">
                           <Form.Control
                             id="input-file"
@@ -277,7 +288,7 @@ function UpdateLink() {
                         </Form.Group>
                       </Col>
                     </Row>
-                    {form.links.map((item, i) => (
+                    {form.links.map((item, index) => (
                       <Row style={{ marginTop: 30 }}>
                         <Col
                           style={{
@@ -299,9 +310,9 @@ function UpdateLink() {
                                     type="text"
                                     // placeholder="ex. Your Title"
                                     name="linkTitle"
-                                    onChange={(e) => linkChange(e, i)}
+                                    onChange={(e) => handleChange(e, index)}
                                     style={styles.linkForm}
-                                    // value={item.linkTitle}
+                                    value={item.linkTitle}
                                   />
                                 </Form.Group>
                               </Col>
@@ -312,9 +323,9 @@ function UpdateLink() {
                                     type="text"
                                     // placeholder="ex. Your Title"
                                     name="url"
-                                    onChange={(e) => linkChange(e, i)}
+                                    onChange={(e) => handleChange(e, index)}
                                     style={styles.linkForm}
-                                    // value={item.url}
+                                    value={item.url}
                                   />
                                 </Form.Group>
                               </Col>

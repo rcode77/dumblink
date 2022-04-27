@@ -1,5 +1,5 @@
 import { Container, Row, Col, Button, Form, Alert } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { useContext, useState, useEffect } from "react";
 
@@ -70,6 +70,7 @@ const styles = {
 };
 
 function AddLink() {
+  const navigate = useNavigate();
   const titlePage = "Template";
   const [message, setMessage] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -129,13 +130,13 @@ function AddLink() {
       console.log(response);
       console.log(form);
 
-      // setForm({
-      //   title: "",
-      //   description: "",
-      //   links: [],
-      // });
+      setForm({
+        title: "",
+        description: "",
+        links: [],
+      });
 
-      // setPreview(null);
+      setPreview(null);
 
       if (response.data.status === "success") {
         const alert = (
@@ -149,6 +150,8 @@ function AddLink() {
         setMessage(alert);
 
         new FormData();
+
+        navigate("/my-link");
       } else {
         const alert = (
           <Alert
