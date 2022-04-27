@@ -43,7 +43,7 @@ exports.getLinks = async (req, res) => {
         //     },
         //   },
         // ],
-        exclude: ["createdAt", "updatedAt", "idUser"],
+        exclude: ["createdAt", "updatedAt"],
       },
     });
 

@@ -1,25 +1,18 @@
 import { Container, Row, Col, Button, Form, InputGroup } from "react-bootstrap";
+import { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faBookSkull,
   faEdit,
   faEye,
   faSearch,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 
-// import banner from "./../assets/Frame1.png";
-
-// import Navbar from "../components/navbar/Navbar";
-// import DangerPopUp from "../components/popup/DangerPopUp";
-// import ListBook from "../components/ListBook";
-
 import { API } from "../config/api";
-// import { UserContext } from "../context/UserContext";
+import { UserContext } from "../context/UserContext";
 import templateData from "../fakeData/templateData";
-import { useState, useEffect } from "react";
 import DeletePopUp from "../components/DeletePopUp";
 
 const styles = {
@@ -84,6 +77,7 @@ const styles = {
 
 function MyLink() {
   const title = "MyLink";
+  const [state, dispatch] = useContext(UserContext);
 
   // Create variabel for id product and confirm delete data with useState here ...
   const [idDelete, setIdDelete] = useState(null);
@@ -178,7 +172,7 @@ function MyLink() {
                     <Form.Control
                       type="text"
                       placeholder="Find your link"
-                      name="fullName"
+                      name="search"
                       // onChange={handleChange}
                       style={styles.form}
                       // value={isbn}
@@ -193,99 +187,103 @@ function MyLink() {
 
             {links?.map((item) => (
               <Row style={{ marginTop: 45 }}>
-                <Col
-                  md={11}
-                  style={{
-                    marginLeft: 30,
-                    borderRadius: 10,
-                    padding: 20,
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                >
-                  <Col md={5}>
-                    <Row style={{ display: "flex", alignItems: "center" }}>
-                      <Col md={4}>
-                        <img
-                          src={item.linkImage}
-                          alt="link"
-                          style={{
-                            width: "120px",
-                            height: "120px",
-                            objectFit: "cover",
-                            objectPosition: "middle",
-                          }}
-                        />
-                      </Col>
-                      <Col style={{ marginLeft: 10 }}>
-                        <p style={styles.text}>{item.title}</p>
-                        <p style={styles.subText}>
-                          {"localhost:3000/preview-link/" + item.uniqueLink}
-                        </p>
-                      </Col>
-                    </Row>
-                  </Col>
-                  <Col md={3}>
-                    <Row>
-                      <center>
-                        <Col>
-                          <p style={styles.text}>{item.viewCount}</p>
-                          <p style={styles.subText}>visit</p>
-                        </Col>
-                      </center>
-                    </Row>
-                  </Col>
-                  <Col style={{ marginLeft: 50 }}>
-                    <Row>
-                      <Col>
-                        <Link to={"/preview-link/" + item.uniqueLink}>
-                          <Button
+                {item.idUser === state.user.id ? (
+                  <Col
+                    md={11}
+                    style={{
+                      marginLeft: 30,
+                      borderRadius: 10,
+                      padding: 20,
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Col md={5}>
+                      <Row style={{ display: "flex", alignItems: "center" }}>
+                        <Col md={4}>
+                          <img
+                            src={item.linkImage}
+                            alt="link"
                             style={{
-                              backgroundColor: "#E5E5E5",
-                              borderColor: "#7E7A7A",
+                              width: "120px",
+                              height: "120px",
+                              objectFit: "cover",
+                              objectPosition: "middle",
                             }}
-                          >
-                            <FontAwesomeIcon
-                              style={{ color: "#7E7A7A" }}
-                              icon={faEye}
-                            />
-                          </Button>
-                        </Link>
-                      </Col>
-                      <Col>
-                        <Link to={"/update-link/" + item.uniqueLink}>
-                          <Button
-                            style={{
-                              backgroundColor: "#E5E5E5",
-                              borderColor: "#7E7A7A",
-                            }}
-                          >
-                            <FontAwesomeIcon
-                              style={{ color: "#7E7A7A" }}
-                              icon={faEdit}
-                            />
-                          </Button>
-                        </Link>
-                      </Col>
-                      <Col>
-                        <Button
-                          onClick={() => {
-                            handleDelete(item.id);
-                          }}
-                          style={{
-                            backgroundColor: "#E5E5E5",
-                            borderColor: "#7E7A7A",
-                          }}
-                        >
-                          <FontAwesomeIcon
-                            style={{ color: "#7E7A7A" }}
-                            icon={faTrash}
                           />
-                        </Button>
-                      </Col>
-                    </Row>
+                        </Col>
+                        <Col style={{ marginLeft: 10 }}>
+                          <p style={styles.text}>{item.title}</p>
+                          <p style={styles.subText}>
+                            {"localhost:3000/preview-link/" + item.uniqueLink}
+                          </p>
+                        </Col>
+                      </Row>
+                    </Col>
+                    <Col md={3}>
+                      <Row>
+                        <center>
+                          <Col>
+                            <p style={styles.text}>{item.viewCount}</p>
+                            <p style={styles.subText}>visit</p>
+                          </Col>
+                        </center>
+                      </Row>
+                    </Col>
+                    <Col style={{ marginLeft: 50 }}>
+                      <Row>
+                        <Col>
+                          <Link to={"/preview-link/" + item.uniqueLink}>
+                            <Button
+                              style={{
+                                backgroundColor: "#E5E5E5",
+                                borderColor: "#7E7A7A",
+                              }}
+                            >
+                              <FontAwesomeIcon
+                                style={{ color: "#7E7A7A" }}
+                                icon={faEye}
+                              />
+                            </Button>
+                          </Link>
+                        </Col>
+                        <Col>
+                          <Link to={"/update-link/" + item.uniqueLink}>
+                            <Button
+                              style={{
+                                backgroundColor: "#E5E5E5",
+                                borderColor: "#7E7A7A",
+                              }}
+                            >
+                              <FontAwesomeIcon
+                                style={{ color: "#7E7A7A" }}
+                                icon={faEdit}
+                              />
+                            </Button>
+                          </Link>
+                        </Col>
+                        <Col>
+                          <Button
+                            onClick={() => {
+                              handleDelete(item.id);
+                            }}
+                            style={{
+                              backgroundColor: "#E5E5E5",
+                              borderColor: "#7E7A7A",
+                            }}
+                          >
+                            <FontAwesomeIcon
+                              style={{ color: "#7E7A7A" }}
+                              icon={faTrash}
+                            />
+                          </Button>
+                        </Col>
+                      </Row>
+                    </Col>
                   </Col>
-                </Col>
+                ) : (
+                  <></>
+                )}
               </Row>
             ))}
           </Col>
